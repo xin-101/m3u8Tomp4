@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+*.spec
+
+# 运行时
+logs/*.log
+logs/*.db
+logs/*.db-journal
+logs/*.db-wal
+logs/*.db-shm
+download_cache/
+tests/out/
+tests/cache/
+tests/media/full*.ts
+tests/out_probe.mp4
+test_e2e.log
+err.txt
+out.txt
+
+# 大型二进制(ffmpeg.exe 解压包)
+resources/ffmpeg.exe
+resources/*.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+Desktop.ini
