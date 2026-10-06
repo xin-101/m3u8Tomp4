@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "m3u8ToMp4 助手",
+  "version": "1.0.0",
+  "description": "检测网页中的 M3U8 视频流, 一键发送到 m3u8ToMp4 客户端下载转换",
+  "permissions": ["webRequest", "contextMenus", "storage", "activeTab", "scripting", "tabs"],
+  "host_permissions": ["<all_urls>", "http://127.0.0.1:18888/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "m3u8ToMp4 助手"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

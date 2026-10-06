@@ -61,7 +61,12 @@ class TaskManager(QObject):
         self._all: dict[str, TaskInfo] = {}
         self._history_hook = None   # 由 Phase 6 注入: fn(task_id, name, path, status)
         self._paused_waiting: list[TaskInfo] = []
-        self.cache_root = os.path.join(os.getcwd(), "download_cache")
+        import sys
+
+        if getattr(sys, "frozen", False) and hasattr(sys, "executable"):
+            self.cache_root = os.path.join(os.path.dirname(sys.executable), "download_cache")
+        else:
+            self.cache_root = os.path.join(os.getcwd(), "download_cache")
         os.makedirs(self.cache_root, exist_ok=True)
         logger.info("TaskManager 初始化, 并发=%s, 限速=%s", self.config.max_concurrent, self.config.speed_limit)
 

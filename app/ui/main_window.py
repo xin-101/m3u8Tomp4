@@ -294,6 +294,15 @@ class MainWindow(QMainWindow):
         self.manager.task_log.connect(self._on_manager_log)
         self.manager.task_completed.connect(self._on_manager_completed)
         self.manager.task_failed.connect(self._on_manager_failed)
+        self._init_extension_api()
+
+    def _init_extension_api(self):
+        from app.browser.extension_api import ExtensionApiServer
+
+        self.extension_server = ExtensionApiServer()
+        self.extension_server.signals.task_requested.connect(self._on_extension_task)
+        self.extension_server.signals.error.connect(lambda msg: self._on_manager_log("--", f"插件API错误: {msg}"))
+        self.extension_server.start()
 
     # ---------- 任务生命周期 ----------
     def _on_task_created(self, info):
@@ -317,6 +326,15 @@ class MainWindow(QMainWindow):
         except Exception as exc:
             logger.exception("任务操作失败: %s/%s", task_id, action)
             QMessageBox.warning(self, "操作失败", str(exc))
+
+    def _on_extension_task(self, url: str, title: str, referer: str):
+        from app.ui.task_widget import TaskInfo, sanitize_filename
+
+        name = sanitize_filename(title) if title else "浏览器任务"
+        info = TaskInfo(name=name, url=url, referer=referer, auto_convert=self.manager.config.auto_convert)
+        self.task_page.add_task(info)
+        self._on_task_created(info)
+        self._on_manager_log(info.id, f"来自插件: {url}")
 
     def _on_redownload(self, url: str, name: str):
         self._switch_page(0)
@@ -575,8 +593,11 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """关闭时保存任务状态并停止所有下载."""
         try:
+            from PySide6.QtWidgets import QApplication
+
+            headless = QApplication.platformName() in ("offscreen", "minimal")
             running = self.manager.running_count() + self.manager.pending_count()
-            if running > 0:
+            if running > 0 and not headless:
                 ret = QMessageBox.question(
                     self, "退出确认",
                     f"当前有 {running} 个任务未完成, 退出将保存进度(下次启动可继续)。\n确定退出?",
@@ -586,6 +607,8 @@ class MainWindow(QMainWindow):
                     event.ignore()
                     return
             self.manager.stop_all()
+            if getattr(self, "extension_server", None):
+                self.extension_server.stop()
             # 持久化所有活跃任务
             for info in self.manager.all_tasks():
                 if info.status not in ("完成",):

@@ -9,8 +9,15 @@ from PySide6.QtCore import Qt
 from app.ui.main_window import MainWindow
 
 
+def _app_base_dir() -> Path:
+    """返回应用基准目录: frozen(onefile) 时基于 exe 位置, 否则基于源码目录."""
+    if getattr(sys, "frozen", False) and hasattr(sys, "executable"):
+        return Path(sys.executable).parent
+    return Path(__file__).resolve().parent
+
+
 def setup_logging() -> logging.Logger:
-    logs_dir = Path(__file__).parent / "logs"
+    logs_dir = _app_base_dir() / "logs"
     logs_dir.mkdir(exist_ok=True)
     logger = logging.getLogger("m3u8ToMp4")
     logger.setLevel(logging.DEBUG)

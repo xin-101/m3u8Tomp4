@@ -12,6 +12,14 @@ logger = logging.getLogger("m3u8ToMp4.database")
 
 DEFAULT_DB = os.path.join("logs", "m3u8ToMp4.db")
 
+
+def _default_db_path() -> str:
+    import sys
+
+    if getattr(sys, "frozen", False) and hasattr(sys, "executable"):
+        return os.path.join(os.path.dirname(sys.executable), "logs", "m3u8ToMp4.db")
+    return DEFAULT_DB
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS download_task (
     id TEXT PRIMARY KEY,
@@ -57,7 +65,9 @@ def _now() -> str:
 class Database:
     """线程安全的 SQLite 访问层(每线程独立连接)."""
 
-    def __init__(self, db_path: str = DEFAULT_DB):
+    def __init__(self, db_path: str | None = None):
+        if db_path is None:
+            db_path = _default_db_path()
         self.db_path = db_path
         os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
         self._local = threading.local()

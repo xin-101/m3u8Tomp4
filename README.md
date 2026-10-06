@@ -61,14 +61,27 @@ m3u8ToMp4/
 │   │   ├── ffmpeg_engine.py# FFmpeg引擎
 │   │   └── speed_controller.py # 令牌桶限速
 │   ├── database/           # SQLite数据层
-│   └── browser/            # 浏览器插件(待实现)
-├── resources/              # ffmpeg.exe等资源
-├── logs/                   # 运行日志+数据库
+│   └── browser/            # 浏览器插件 API
+│       └── extension_api.py# 本地 API 服务(127.0.0.1:18888)
+├── browser-extension/      # Chrome 扩展(MV3)
+├── resources/              # ffmpeg.exe 等资源
+├── logs/                   # 运行日志与数据库
 ├── download_cache/         # 断点续传缓存
+├── docs/                   # 使用手册/开发说明/测试报告
 ├── tests/                  # 测试与夹具
 ├── requirements.txt
 ├── build.bat
 └── README.md
+```
+
+## 运行成品(release)
+
+```
+release/
+├── m3u8ToMp4.exe  # 双击运行, 无需 Python
+├── ffmpeg.exe     # 随包提供, 无需单独安装
+├── README.txt
+└── config/
 ```
 
 ## 开发阶段
@@ -79,8 +92,8 @@ m3u8ToMp4/
 - [x] Phase 4: 下载任务管理
 - [x] Phase 5: 断点续传
 - [x] Phase 6: 历史数据库
-- [ ] Phase 7: 浏览器插件(API预留)
-- [ ] Phase 8: 打包exe
+- [x] Phase 7: 浏览器插件(API + Chrome扩展)
+- [x] Phase 8: 打包exe
 
 ## 日志
 
